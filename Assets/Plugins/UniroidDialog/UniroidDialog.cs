@@ -18,7 +18,7 @@ namespace UniroidDialog
         /// <summary>
         /// the event touched button.
         /// </summary>
-        private static event Action<int> OnClickEvent;
+        static event Action<int> OnClickEvent = delegate {};
 
         /// <summary>
         /// constant: positive button touched

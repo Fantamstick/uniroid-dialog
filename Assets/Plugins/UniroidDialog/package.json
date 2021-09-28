@@ -1,12 +1,12 @@
 {
   "name": "com.fantamstick.uniroid-dialog",
   "displayName": "Uniroid Dialog",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "unity": "2019.4",
   "description": "Android Native Dialog Manager for Unity.",
   "type": "library",
   "dependencies": {
     "com.neuecc.unirx": "7.1.0",
-    "com.cysharp.unitask": "2.2.4"
+    "com.cysharp.unitask": "2.2.5"
   }
 }
