@@ -1,7 +1,6 @@
 using System;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
-using UniRx;
 
 namespace UniroidDialog
 {
@@ -35,14 +34,24 @@ namespace UniroidDialog
         /// <param name="title">dialog title</param>
         /// <param name="buttonsText">texts for buttons</param>
         /// <returns>the text of touched button</returns>
-        public static async UniTask<string> ShowAsyncAlertWithTitleAndListButtons(string title, string[] buttonsText)
+        public static async Task<string> ShowAsyncAlertWithTitleAndListButtons(string title, string[] buttonsText)
         {
             UniroidDialog.ShowListButtons(title, buttonsText);
-            int result = await Observable.FromEvent<int>(
-                    h => OnClickEvent += h,
-                    h => OnClickEvent -= h) 
-                .ToUniTask(true);
-            return buttonsText[result];
+            
+            int? result = null;
+            OnClickEvent += WaitForClickEvent;
+
+            while (!result.HasValue) {
+                await Task.Delay(TimeSpan.FromMilliseconds(50));
+            }
+
+            return buttonsText[result.Value];
+
+            
+            void WaitForClickEvent(int clickResult) {
+                OnClickEvent -= WaitForClickEvent;
+                result = clickResult;
+            }
         }
 
         /// <summary>
@@ -51,14 +60,23 @@ namespace UniroidDialog
         /// <param name="title">dialog title</param>
         /// <param name="message">dialog message</param>
         /// <param name="buttonText">text for positive button</param>
-        public static async UniTask ShowAsyncAlertWithTitleMessageAndOk(string title, string message,
+        public static async Task ShowAsyncAlertWithTitleMessageAndOk(string title, string message,
             string buttonText)
         {
             UniroidDialog.ShowOk(title, message, buttonText);
-            await Observable.FromEvent<int>(
-                    h => OnClickEvent += h,
-                    h => OnClickEvent -= h) 
-                .ToUniTask(true);
+
+            bool isDialogClosed = false;
+            OnClickEvent += WaitForClickEvent;
+
+            while (!isDialogClosed) {
+                await Task.Delay(TimeSpan.FromMilliseconds(50));
+            }
+
+            
+            void WaitForClickEvent(int clickResult) {
+                OnClickEvent -= WaitForClickEvent;
+                isDialogClosed = true;
+            }
         }
 
         /// <summary>
@@ -69,15 +87,25 @@ namespace UniroidDialog
         /// <param name="positiveButtonsText">text for positive button</param>
         /// <param name="negativeButtonText">text for negative button</param>
         /// <returns>true:touched positive / false:touched negative</returns>
-        public static async UniTask<bool> ShowAsyncAlertWithTitleMessageAndOkCancel(string title, string message,
+        public static async Task<bool> ShowAsyncAlertWithTitleMessageAndOkCancel(string title, string message,
             string positiveButtonsText, string negativeButtonText)
         {
             UniroidDialog.ShowOkCancel(title, message, positiveButtonsText, negativeButtonText);
-            int result = await Observable.FromEvent<int>(
-                    h => OnClickEvent += h, 
-                    h => OnClickEvent -= h) 
-                .ToUniTask(true);
-            return result == TOUCHED_POSITIVE;
+
+            int? result = null;
+            OnClickEvent += WaitForClickEvent;
+
+            while (!result.HasValue) {
+                await Task.Delay(TimeSpan.FromMilliseconds(50));
+            }
+
+            return result.Value == TOUCHED_POSITIVE;
+
+            
+            void WaitForClickEvent(int clickResult) {
+                OnClickEvent -= WaitForClickEvent;
+                result = clickResult;
+            }
         }
 
         /// <summary>
@@ -87,7 +115,7 @@ namespace UniroidDialog
         /// <param name="message">dialog message</param>
         /// <param name="buttonsText">[0]: text for positive button / [1]: text for negative button</param>
         /// <returns>true:touched positive / false:touched negative</returns>
-        public static async UniTask<bool> ShowAsyncAlertWithTitleMessageAndOkCancel(string title, string message,
+        public static async Task<bool> ShowAsyncAlertWithTitleMessageAndOkCancel(string title, string message,
             string[] buttonsText)
         {
             return await UniroidDialog.ShowAsyncAlertWithTitleMessageAndOkCancel(title, message, buttonsText[0],

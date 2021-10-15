@@ -1,8 +1,7 @@
 {
     "name": "Uniroid.Sample",
     "references": [
-        "GUID:08dd07e5e169497087713b82c31024a0",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "GUID:08dd07e5e169497087713b82c31024a0"
     ],
     "includePlatforms": [
         "Android",
